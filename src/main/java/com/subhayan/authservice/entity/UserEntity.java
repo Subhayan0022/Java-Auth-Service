@@ -24,9 +24,10 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String role = "normal_user";
+    private Role role = Role.USER;
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false, name = "created_at")
