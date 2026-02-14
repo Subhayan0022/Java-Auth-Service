@@ -1,12 +1,12 @@
 package com.subhayan.authservice.service;
 
 import com.subhayan.authservice.dto.DtoAuthRegister.*;
+import com.subhayan.authservice.entity.Role;
 import com.subhayan.authservice.entity.UserEntity;
 import com.subhayan.authservice.exception.UserAlreadyExistsException;
 import com.subhayan.authservice.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +38,7 @@ public class UserRegister {
         String password = userRegisterRequestDTO.password();
         String encodedPassword = passwordEncoder.encode(password);
         entity.setPassword(encodedPassword);
+        entity.setRole(Role.USER);
 
         return entity;
     }
