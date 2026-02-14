@@ -2,6 +2,8 @@ package com.subhayan.authservice.controller;
 
 import com.subhayan.authservice.dto.DtoAuthRegister.*;
 import com.subhayan.authservice.service.UserRegister;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +20,8 @@ public class AuthRegister {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegisterResponseDTO> registerUser(@RequestBody UserRegisterRequestDTO userRegisterRequestDTO) {
+    public ResponseEntity<UserRegisterResponseDTO> registerUser(@Valid @RequestBody UserRegisterRequestDTO userRegisterRequestDTO) {
         UserRegisterResponseDTO userRegisterCreated = userRegister.registerUser(userRegisterRequestDTO);
-        return ResponseEntity.ok(userRegisterCreated);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userRegisterCreated);
     }
 }
