@@ -13,12 +13,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String[] AUTH_WHITELIST = {
+            "/auth/register",
+            "/auth/login",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/register", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();

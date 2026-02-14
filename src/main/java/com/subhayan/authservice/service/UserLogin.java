@@ -6,6 +6,7 @@ import com.subhayan.authservice.exception.InvalidCredentialsException;
 import com.subhayan.authservice.repository.UserRepository;
 import com.subhayan.authservice.security.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class UserLogin {
         this.jwtUtil = jwtUtil;
     }
 
-    public JwtResponse login(LoginRequest loginRequest) {
+    public JwtResponse loginUser(@NonNull LoginRequest loginRequest) {
         // Check if the user email in login requests exists in DB.
         UserEntity user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> {
