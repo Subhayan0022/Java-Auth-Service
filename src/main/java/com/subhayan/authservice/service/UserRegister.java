@@ -39,11 +39,25 @@ public class UserRegister {
         String encodedPassword = passwordEncoder.encode(password);
         entity.setPassword(encodedPassword);
         entity.setRole(Role.USER);
+        entity.setSalutation(userRegisterRequestDTO.salutation());
+        entity.setFirstName(userRegisterRequestDTO.firstName());
+        entity.setLastName(userRegisterRequestDTO.lastName());
+        entity.setPhoneNumber(userRegisterRequestDTO.phoneNumber());
+        entity.setDateOfBirth(userRegisterRequestDTO.dateOfBirth());
 
         return entity;
     }
 
     private UserRegisterResponseDTO mapRequestDTOToRequest(@NotNull UserEntity entity) {
-        return  new UserRegisterResponseDTO(entity.getId(), entity.getEmail(), entity.getRole());
+        return new UserRegisterResponseDTO(
+                entity.getId(),
+                entity.getSalutation(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getEmail(),
+                entity.getPhoneNumber(),
+                entity.getDateOfBirth(),
+                entity.getRole()
+        );
     }
 }
