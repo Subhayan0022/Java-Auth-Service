@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -28,6 +30,22 @@ public class UserEntity {
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Salutation salutation;
+
+    @Column(nullable = false, name = "first_name")
+    private String firstName;
+
+    @Column(nullable = false, name = "last_name")
+    private String lastName;
+
+    @Column(nullable = false, name = "phone_number")
+    private String phoneNumber;
+
+    @Column(nullable = false, name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false, name = "created_at")
