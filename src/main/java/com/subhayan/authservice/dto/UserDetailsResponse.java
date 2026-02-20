@@ -10,8 +10,8 @@ import java.util.UUID;
 public record UserDetailsResponse(
         UUID id,
         Salutation salutation,
-        String firstname,
-        String lastname,
+        String firstName,
+        String lastName,
         String email,
         String phoneNumber,
         LocalDate dateOfBirth,
