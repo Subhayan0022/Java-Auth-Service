@@ -1,5 +1,6 @@
 package com.subhayan.authservice.service;
 
+import com.subhayan.authservice.dto.AdminUpdateRequest;
 import com.subhayan.authservice.dto.PagedUserResponse;
 import com.subhayan.authservice.dto.UserDetailsResponse;
 import com.subhayan.authservice.entity.Role;
@@ -56,5 +57,39 @@ public class AdminService {
         return new PagedUserResponse(users, page, pageSize, result.getTotalElements());
     }
 
+    public UserDetailsResponse updateUser(UUID userId, AdminUpdateRequest adminUpdateRequest) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found for update", userId);
+                    return new RuntimeException("User with id " + userId + " not found");
+                });
 
+        // REFACTOR: Learn about MapStruct later and improve this!
+        if (adminUpdateRequest.salutation() != null) {
+            user.setSalutation(adminUpdateRequest.salutation());
+        }
+        if (adminUpdateRequest.firstName() != null) {
+            user.setFirstName(adminUpdateRequest.firstName());
+        }
+        if (adminUpdateRequest.lastName() != null) {
+            user.setLastName(adminUpdateRequest.lastName());
+        }
+        if (adminUpdateRequest.email() != null) {
+            user.setEmail(adminUpdateRequest.email());
+        }
+        if (adminUpdateRequest.phoneNumber() != null) {
+            user.setPhoneNumber(adminUpdateRequest.phoneNumber());
+        }
+        if (adminUpdateRequest.dateOfBirth() != null) {
+            user.setDateOfBirth(adminUpdateRequest.dateOfBirth());
+        }
+        if (adminUpdateRequest.role() != null) {
+            user.setRole(adminUpdateRequest.role());
+        }
+
+        UserEntity updatedUser = userRepository.save(user);
+        log.info("ADMIN : User with id {} updated", updatedUser.getId());
+        return mapToUserDetailsResponse(updatedUser);
+
+    }
 }
