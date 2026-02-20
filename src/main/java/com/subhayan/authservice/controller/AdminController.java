@@ -1,13 +1,12 @@
 package com.subhayan.authservice.controller;
 
+import com.subhayan.authservice.dto.PagedUserResponse;
 import com.subhayan.authservice.dto.UserDetailsResponse;
+import com.subhayan.authservice.entity.Role;
 import com.subhayan.authservice.service.AdminService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -22,9 +21,10 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @GetMapping("/queryUsers")
-    public ResponseEntity<String> getAllUsers() {
-        return ResponseEntity.ok("All Users for admin");
+    @GetMapping("/user/query")
+    public ResponseEntity<PagedUserResponse> queryUsers(
+            @RequestParam(required = false) Role role, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(adminService.queryUsers(role, page, pageSize));
     }
 
     @GetMapping("/user/{userId}")
