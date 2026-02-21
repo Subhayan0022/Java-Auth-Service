@@ -38,4 +38,10 @@ public class AdminController {
     public ResponseEntity<UserDetailsResponse> updateUser(@PathVariable UUID userId, @Valid @RequestBody AdminUpdateRequest adminUpdateRequest) {
         return ResponseEntity.ok(adminService.updateUser(userId, adminUpdateRequest));
     }
+
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        adminService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -51,7 +51,7 @@ public class AdminService {
     public PagedUserResponse queryUsers(Role role, int page, int pageSize) {
         PageRequest pageable = PageRequest.of(page, pageSize);
 
-        Page<UserEntity> result = (role != null) ? userRepository.findByRoleAndIsActive(role, true, pageable) : userRepository.findByIsActive(true, pageable);
+        Page<UserEntity> result = (role != null) ? userRepository.findByRoleAndActive(role, true, pageable) : userRepository.findByActive(true, pageable);
         List<UserDetailsResponse> users = result.getContent().stream().map(this::mapToUserDetailsResponse).toList();
         log.info("ADMIN : Querying users for page {}, and page size {}", page, pageSize);
         return new PagedUserResponse(users, page, pageSize, result.getTotalElements());

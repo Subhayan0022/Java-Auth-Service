@@ -53,6 +53,6 @@ public class UserEntity {
 
     @Column(nullable = false, name = "is_active")
     @Builder.Default // Otherwise defaults to FALSE
-    private boolean isActive;
+    private boolean active = true;
 
 }
