@@ -11,6 +11,10 @@ spring:
     show-sql: true
   flyway:
     enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 jwt:
   secret: A3EWryOhza/n9If4BVdJ7ug6UJFjoiegWAXA7KI4TTg=
