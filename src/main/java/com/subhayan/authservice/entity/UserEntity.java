@@ -51,4 +51,8 @@ public class UserEntity {
     @Column(updatable = false, nullable = false, name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, name = "is_active")
+    @Builder.Default // Otherwise defaults to FALSE
+    private boolean isActive;
+
 }
