@@ -15,6 +15,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtAuthFilter jwtAuthFilter;
+    private final RateLimiterFilter rateLimiterFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter,  RateLimiterFilter rateLimiterFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.rateLimiterFilter = rateLimiterFilter;
+    }
+
     private static final String[] AUTH_WHITELIST = {
             "/auth/**",
             "/swagger-ui/**",
@@ -28,7 +36,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(AUTH_WHITELIST).permitAll().requestMatchers("/api/user/**").hasRole("USER").requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
-            ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+             .addFilterBefore(rateLimiterFilter, JwtAuthFilter.class);
         return http.build();
     }
 
