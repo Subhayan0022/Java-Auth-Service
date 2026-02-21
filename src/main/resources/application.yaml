@@ -2,9 +2,9 @@ spring:
   application:
     name: authservice
   datasource:
-    url: jdbc:postgresql://localhost:5432/authservice
-    username: postgres
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/authservice}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -13,8 +13,8 @@ spring:
     enabled: true
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 management:
   endpoints:
@@ -26,6 +26,6 @@ management:
       show-details: always
 
 jwt:
-  secret: A3EWryOhza/n9If4BVdJ7ug6UJFjoiegWAXA7KI4TTg=
-  expiration: 1800000
+  secret: ${JWT_SECRET:A3EWryOhza/n9If4BVdJ7ug6UJFjoiegWAXA7KI4TTg=}
+  expiration: ${JWT_EXPIRATION:1800000}
 
