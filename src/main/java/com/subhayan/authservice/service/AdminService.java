@@ -7,6 +7,9 @@ import com.subhayan.authservice.entity.Role;
 import com.subhayan.authservice.entity.UserEntity;
 import com.subhayan.authservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
+    @Cacheable(value = "users", key = "#userId")
     public UserDetailsResponse getUserDetailsById(UUID userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -48,6 +52,7 @@ public class AdminService {
         );
     }
 
+    @Cacheable(value = "userQueries", key = "#role + '-' + #page + '-' + #pageSize")
     public PagedUserResponse queryUsers(Role role, int page, int pageSize) {
         PageRequest pageable = PageRequest.of(page, pageSize);
 
@@ -57,6 +62,10 @@ public class AdminService {
         return new PagedUserResponse(users, page, pageSize, result.getTotalElements());
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#userId"),
+            @CacheEvict(value = "userQueries", allEntries = true)
+    })
     public UserDetailsResponse updateUser(UUID userId, AdminUpdateRequest adminUpdateRequest) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -92,6 +101,10 @@ public class AdminService {
         return mapToUserDetailsResponse(updatedUser);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#userId"),
+            @CacheEvict(value = "userQueries", allEntries = true)
+    })
     public void deleteUser(UUID userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> {
