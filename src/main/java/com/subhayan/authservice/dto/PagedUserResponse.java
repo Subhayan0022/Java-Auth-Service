@@ -1,5 +1,6 @@
 package com.subhayan.authservice.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
 public record PagedUserResponse(
@@ -7,4 +8,4 @@ public record PagedUserResponse(
         int page,
         int pageSize,
         long totalUsers
-) {}
+) implements Serializable {}
