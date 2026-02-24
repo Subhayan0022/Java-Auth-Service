@@ -11,5 +11,8 @@ public class DtoAuthLogin {
     }
 
     // Simply return the token here.
-    public record JwtResponse(String token) {}
+    public record AuthResponse(String token, String refreshToken) {}
+
+    public record RefreshRequest(
+            @NotBlank String refreshToken) {}
 }

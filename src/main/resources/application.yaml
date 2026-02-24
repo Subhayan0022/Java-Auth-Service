@@ -27,5 +27,6 @@ management:
 
 jwt:
   secret: ${JWT_SECRET:A3EWryOhza/n9If4BVdJ7ug6UJFjoiegWAXA7KI4TTg=}
-  expiration: ${JWT_EXPIRATION:1800000}
+  expiration: ${JWT_EXPIRATION:900000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 

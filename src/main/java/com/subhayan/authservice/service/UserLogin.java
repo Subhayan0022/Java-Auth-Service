@@ -5,8 +5,8 @@ import com.subhayan.authservice.entity.UserEntity;
 import com.subhayan.authservice.exception.InvalidCredentialsException;
 import com.subhayan.authservice.repository.UserRepository;
 import com.subhayan.authservice.security.JwtUtil;
+import com.subhayan.authservice.security.RefreshTokenService;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +16,16 @@ public class UserLogin {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
 
-    public UserLogin(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserLogin(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,  RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
     }
 
-    public JwtResponse loginUser(@NonNull LoginRequest loginRequest) {
+    public AuthResponse loginUser(LoginRequest loginRequest) {
         // Check if the user email in login requests exists in DB.
         UserEntity user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> {
@@ -37,8 +39,10 @@ public class UserLogin {
             throw new InvalidCredentialsException("Invalid email or password"); // For security, be obscure.
         }
 
-        String jwtToken = jwtUtil.generateToken(user.getId().toString());
-        log.debug("Generated JWT token: {}", jwtToken);
-        return new JwtResponse(jwtToken);
+        String userId = user.getId().toString();
+        String accessToken = jwtUtil.generateToken(userId);
+        String refreshToken = refreshTokenService.generateRefreshToken(userId);
+        log.debug("Generated JWT token: {}", accessToken);
+        return new AuthResponse(accessToken, refreshToken);
     }
 }
