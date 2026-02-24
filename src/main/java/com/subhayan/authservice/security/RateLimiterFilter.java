@@ -30,7 +30,7 @@ public class RateLimiterFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, java.io.IOException {
         String path = request.getRequestURI();
 
-        if (!path.equals("/auth/login") &&  !path.equals("/auth/register")) {
+        if (!path.equals("/auth/login") && !path.equals("/auth/register") && !path.equals("/auth/refresh")) {
             filterChain.doFilter(request, response);
             return;
         }

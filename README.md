@@ -92,26 +92,33 @@ Notes
 
 ## Security
 
-### Authentication — JWT (HS256)
+### Authentication — JWT (HS256) + Refresh Tokens
 
-- On login, a signed JWT is issued with the user's **UUID as the subject** (not email)
-- Tokens expire after **30 minutes** (configurable via `JWT_EXPIRATION`)
-- The secret is a Base64-encoded 256-bit key set via environment variable `JWT_SECRET`
-- Every protected request must include `Authorization: Bearer <token>`
+- On login, two tokens are issued:
+  - **Access token** — signed JWT (HS256), UUID as subject, expires in **15 minutes**
+  - **Refresh token** — random UUID, stored in Redis, expires in **7 days**
+- When the access token expires, the client uses the refresh token to get a new pair silently
+- Refresh tokens are **rotated** on every use — old token is deleted, new one is issued
+- Logout deletes the refresh token from Redis, immediately invalidating the session
+- The JWT secret is a Base64-encoded 256-bit key set via environment variable `JWT_SECRET`
+- Every protected request must include `Authorization: Bearer <access_token>`
 
 ### Authorization — RBAC
 
-| Path prefix    | Required role | Notes                        |
-|----------------|---------------|------------------------------|
-| `/auth/**`     | None          | Register and login           |
-| `/api/user/**` | `ROLE_USER`   | Authenticated users          |
-| `/api/admin/**`| `ROLE_ADMIN`  | Admin-only CRUD              |
-| `/actuator/**` | None          | Health check (internal)      |
-| `/swagger-ui/**` | None        | API docs                     |
+| Path              | Required role | Notes                        |
+|-------------------|---------------|------------------------------|
+| `/auth/register`  | None          | Register                     |
+| `/auth/login`     | None          | Login                        |
+| `/auth/refresh`   | None          | Refresh access token         |
+| `/auth/logout`    | `ROLE_USER`   | Invalidate refresh token     |
+| `/api/user/**`    | `ROLE_USER`   | Authenticated users          |
+| `/api/admin/**`   | `ROLE_ADMIN`  | Admin-only CRUD              |
+| `/actuator/**`    | None          | Health check (internal)      |
+| `/swagger-ui/**`  | None          | API docs                     |
 
 ### Rate Limiting — Bucket4j
 
-- Applied only to `/auth/login` and `/auth/register`
+- Applied to `/auth/login`, `/auth/register`, and `/auth/refresh`
 - **5 requests per minute per IP** (token bucket, greedy refill)
 - Returns `429 Too Many Requests` when the bucket is empty
 
@@ -175,9 +182,37 @@ curl -X POST http://localhost:8080/auth/login \
 Response `200 OK`:
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiJ9..."
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "refreshToken": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
+
+#### Refresh
+
+```bash
+curl -X POST http://localhost:8080/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken": "<refreshToken>"}'
+```
+
+Response `200 OK`:
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "refreshToken": "661f9511-f30c-52e5-b827-557766551111"
+}
+```
+
+#### Logout
+
+```bash
+curl -X POST http://localhost:8080/auth/logout \
+  -H "Authorization: Bearer <accessToken>" \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken": "<refreshToken>"}'
+```
+
+Response `204 No Content`
 
 ---
 
@@ -318,3 +353,5 @@ Available at `http://localhost:8080/swagger-ui/index.html` — use the lock icon
 | Health           | Spring Boot Actuator                |
 | Boilerplate      | Lombok                              |
 | Containerization | Docker + Docker Compose             |
+
+#AI generated documentation only.
