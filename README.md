@@ -11,6 +11,7 @@ A production-ready JWT Authentication Microservice built with Spring Boot 3.5, f
 - [Security](#security)
 - [API Reference](#api-reference)
 - [Running Locally](#running-locally)
+- [Testing](#testing)
 - [Tech Stack](#tech-stack)
 
 ---
@@ -336,6 +337,61 @@ Available at `http://localhost:8080/swagger-ui/index.html` — use the lock icon
 
 ---
 
+## Testing
+
+The project includes 62 unit tests covering services, security, controllers, and exception handling. Tests use JUnit 5, Mockito, AssertJ, and Spring MockMvc.
+
+### Running Tests
+
+```bash
+./mvnw test
+```
+
+### Test Structure
+
+```
+src/test/java/com/subhayan/authservice/
+├── service/
+│   ├── UserRegisterTest.java        (4 tests)
+│   ├── UserLoginTest.java           (3 tests)
+│   └── AdminServiceTest.java        (9 tests)
+├── security/
+│   ├── JwtUtilTest.java             (5 tests)
+│   ├── CustomUserDetailsServiceTest.java (4 tests)
+│   ├── RefreshTokenServiceTest.java (3 tests)
+│   ├── RateLimiterFilterTest.java   (3 tests)
+│   └── JwtAuthFilterTest.java       (4 tests)
+├── controller/
+│   ├── AuthRegisterControllerTest.java  (4 tests)
+│   ├── AuthLoginControllerTest.java     (3 tests)
+│   ├── AuthTokenControllerTest.java     (4 tests)
+│   ├── AdminControllerTest.java         (7 tests)
+│   ├── UserControllerTest.java          (3 tests)
+│   └── TestSecurityConfig.java
+├── exception/
+│   └── GlobalExceptionHandlerTest.java  (5 tests)
+└── AuthServiceApplicationTests.java     (1 test)
+```
+
+### What's Covered
+
+| Layer | What's tested |
+|---|---|
+| **Services** | Registration (happy path, duplicate email, age validation), login (valid credentials, unknown email, wrong password), admin CRUD (get/query/update/delete, null-safe partial updates, soft delete) |
+| **Security** | JWT generation/parsing/validation/expiry/tampering, user details loading by email and ID, refresh token Redis lifecycle, rate limiting (pass-through, 429 on excess), JWT filter (auth context setup, skip when missing/invalid/already authenticated) |
+| **Controllers** | HTTP status codes, request/response mapping, bean validation (blank/invalid fields), role-based access (ADMIN-only endpoints return 403 for USER, 401 for unauthenticated) |
+| **Exceptions** | All 5 `@ExceptionHandler` methods (409, 401, 400, 400, 500) with correct status codes and messages |
+
+### Testing Approach
+
+- **Service/security tests** use `@ExtendWith(MockitoExtension.class)` with `@Mock`/`@InjectMocks` for pure unit testing without Spring context
+- **Controller tests** use `@WebMvcTest` with `MockMvc` for HTTP-layer testing, with a `TestSecurityConfig` that mirrors production RBAC rules without the custom servlet filters
+- Custom filters (`RateLimiterFilter`, `JwtAuthFilter`) are excluded from controller test component scanning to avoid interference, and tested independently
+- Redis operations are mocked via `StringRedisTemplate` — no running Redis instance needed
+- No database required — all repository calls are mocked
+
+---
+
 ## Tech Stack
 
 | Layer            | Technology                          |
@@ -353,5 +409,6 @@ Available at `http://localhost:8080/swagger-ui/index.html` — use the lock icon
 | Health           | Spring Boot Actuator                |
 | Boilerplate      | Lombok                              |
 | Containerization | Docker + Docker Compose             |
+| Testing          | JUnit 5, Mockito, AssertJ, MockMvc  |
 
 #AI generated documentation only.
